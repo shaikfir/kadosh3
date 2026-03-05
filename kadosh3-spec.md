@@ -1,6 +1,9 @@
-# Kadosh 3 — “Kings In The Corners” Solitaire Spec (Client‑Only, No NPM)
+# Kadosh 3 — "Kings In The Corners" Solitaire Spec (Client‑Only, No NPM)
 
-This spec describes **Kadosh 3**, a jungle-themed solitaire/puzzle game inspired by the “Kings In The Corners” ruleset you pasted (cardgames.io style). It is **not** the multiplayer Kings Corner game.
+This spec describes **Kadosh 3**, a jungle-themed solitaire/puzzle game inspired by the "Kings In The Corners" ruleset you pasted (cardgames.io style). It is **not** the multiplayer Kings Corner game.
+
+**Live at**: https://shaikfir.github.io/kadosh3/  
+**Repo**: https://github.com/shaikfir/kadosh3
 
 ---
 
@@ -10,6 +13,7 @@ This spec describes **Kadosh 3**, a jungle-themed solitaire/puzzle game inspired
 - **No npm / no Node toolchain**. Must run by opening `index.html` directly or using any basic static server.
 - Vanilla **HTML/CSS/JS** (ES6).
 - Any third-party assets must be **vendored** into the repo (`/assets`, `/vendor`) and loaded via `<link>` / `<script>`.
+- **Deployable to GitHub Pages** (github.io) via a static GitHub Actions workflow.
 
 ---
 
@@ -26,8 +30,9 @@ You lose if either happens:
 2. The board is full (no empty slots) and **no removable combination summing to 10 exists**.
 
 ### Theme
-- Jungle theme UI.
-- “Game finished” modal shows **an image of a monkey showing its red ass** (local asset provided by you / bundled in `/assets/`).
+- Jungle theme UI with dark green palette, gold accents, and decorative jungle elements.
+- "Game finished" modal shows **a real photo of a monkey showing its red ass** (`/assets/monkey-red-ass.png`).
+- A **fart sound effect** (`/assets/sfx/fart1.ogg`) plays when the game-over modal appears (if sounds are enabled).
 - Game name shown as **Kadosh 3**.
 
 ---
@@ -40,13 +45,13 @@ You lose if either happens:
   **Number cards (A–10) may be placed on *any* slot**, including marked ones.
 
 ### 2.2 Slot role mapping (row/col are 1-based)
-- **Kings**: corners
+- **Kings**: corners — markers display ♚
   - (1,1), (1,4), (4,1), (4,4)
-- **Queens**: middle of top + bottom rows
+- **Queens**: middle of top + bottom rows — markers display ♛
   - (1,2), (1,3), (4,2), (4,3)
-- **Jacks**: middle of left + right columns
+- **Jacks**: middle of left + right columns — markers display **J** (italic)
   - (2,1), (3,1), (2,4), (3,4)
-- **Unmarked**: center 4 squares
+- **Unmarked**: center 4 squares (no marker shown)
   - (2,2), (2,3), (3,2), (3,3)
 
 ---
@@ -56,7 +61,7 @@ You lose if either happens:
 - Standard 52-card deck.
 - Stock is face-down, but the **next card is always visible** (top card shown).
 - There is **no waste pile**:
-  - “Waste” in many solitaire games means a separate pile where drawn cards go temporarily.
+  - "Waste" in many solitaire games means a separate pile where drawn cards go temporarily.
   - **Kadosh 3 has none**: the drawn card must be placed directly onto the board.
 
 ---
@@ -82,6 +87,11 @@ These constraints apply **only when placing a face card**:
 - **Q** may be placed **only** in the 4 Queen slots (top/bottom middles).
 - **J** may be placed **only** in the 4 Jack slots (left/right middles).
 
+#### Royalty slot hover feedback
+When the next card is a face card (J/Q/K), empty slots provide **visual hover feedback**:
+- **Legal slots** glow green on hover (indicating the face card can be placed there).
+- **Illegal slots** are dimmed to 50% opacity and show a red tint with a `not-allowed` cursor on hover.
+
 #### Number-card placement constraints
 - **A–10** can be placed into **any empty slot**, regardless of the slot marker.
 
@@ -106,8 +116,7 @@ When the board is full (16 cards):
   - After any successful removal, if another valid removal exists, the player may continue removing.
 - When **no removals exist**:
   - Switch back to **PLACEMENT phase** if there is still stock remaining (board will have empties).
-  - If stock is empty and board is full and no removals exist → this is already covered by the “board full + no removals” loss condition.
-  - If stock is empty and board is **not** full: placement is impossible; show “No cards left” and keep allowing removals only if the board is full (it won’t be).
+  - If stock is empty and no removals exist → **loss** ("No more moves available").
 
 ---
 
@@ -118,7 +127,7 @@ When the board is full (16 cards):
 - Optional: drag the next card preview onto an empty slot.
 - In removal phase: click/drag between cards to remove.
 
-### 5.2 “Auto-place” assist
+### 5.2 "Auto-place" assist
 - Clicking the **next-card preview** should:
   1. Determine all legal empty slots for that card.
   2. If **exactly one** legal slot exists: auto-place there.
@@ -126,25 +135,31 @@ When the board is full (16 cards):
   4. If none (face blocked): trigger loss.
 
 ### 5.3 Hint button
-A “Hint” button that behaves differently by phase:
+A "Hint" button that behaves differently by phase:
 - Placement phase: highlight all legal empty slots for the next card.
 - Removal phase: highlight at least one removable combo (pair summing to 10 or a single 10).
 
 ### 5.4 Game finished modal
 - On loss, show a modal:
   - Title: **GAME FINISHED**
-  - Monkey red-ass image (asset path configurable, default `/assets/monkey-red-ass.png`)
+  - The **blocking card** that caused the loss is rendered inside the modal (with a red border) so the player can see exactly which card ended the game.
+  - Monkey red-ass photo (`/assets/monkey-red-ass.png`).
+  - **Fart sound effect** (`/assets/sfx/fart1.ogg`) plays when the modal appears (if sounds are enabled in settings).
   - Message text: why you lost (blocked face card / no removals).
   - Buttons:
-    - **Start new game** (only).  
-- No “Keep playing” option.
+    - **New Game** (only).  
+- No "Keep playing" option.
+
+### 5.5 Keyboard shortcuts
+- **Ctrl/Cmd+Z**: Undo
+- **H**: Show hint (when not focused on an input field)
 
 ---
 
-## 6) Undo (Current “Turn” Only)
+## 6) Undo (Current "Turn" Only)
 
-Because this game doesn’t have “turns” in the multiplayer sense, define **turn** as:
-- The sequence from the moment a new card becomes the “next card” preview until it has been placed.
+Because this game doesn't have "turns" in the multiplayer sense, define **turn** as:
+- The sequence from the moment a new card becomes the "next card" preview until it has been placed.
 
 ### Undo scope
 - Allow undo of the **last placement only**, plus any removals made **after** that placement *only if the board was full*.
@@ -156,59 +171,71 @@ Because this game doesn’t have “turns” in the multiplayer sense, define **
 
 ---
 
-## 7) “Game #” (Seeded Shuffles)
+## 7) "Game #" (Seeded Shuffles)
 
 ### Requirements
 - Each game has an integer **Game ID** shown on screen (e.g., `Game #37908`).
 - Given the same Game ID, the shuffle order must be reproducible.
 
-### Implementation approach
-- Use a deterministic PRNG (e.g., Mulberry32 / Xorshift32) seeded with the Game ID.
-- Shuffle deck with Fisher–Yates using that PRNG.
-- “New Game” picks a random Game ID (e.g., 1..10,000,000).
-- Add an input to **start a specific Game ID**.
-- “Restart” restarts the same Game ID.
+### Implementation
+- Uses **Mulberry32** deterministic PRNG seeded with the Game ID.
+- Shuffle deck with **Fisher–Yates** using that PRNG.
+- "New Game" picks a random Game ID (1..10,000,000).
+- Header input field to **start a specific Game ID**.
+- "Restart" restarts the same Game ID.
 
 ---
 
 ## 8) Visual Design & Assets (No NPM)
 
-### 8.1 Card art options
-Implement cards in two modes (selectable in Options):
-1. **Asset deck** (SVG/PNG) in `/assets/cards/` (recommended for “beautiful”).
-2. **CSS-rendered** (fallback): rank text + suit symbol.
+### 8.1 Card rendering
+Cards are **CSS-rendered**: rank text + suit symbol (♥♦♣♠) with red/black coloring.
+- Top-left: rank
+- Center: large suit symbol
+- Bottom-right: suit (rotated 180°)
 
-### 8.2 Suggested free/open decks to vendor
-Candidates to download and store locally in your repo:
-- **SVGCards** (public-domain decks). citeturn0search3
-- **revk.uk SVG Vector Playing Cards** (released under CC0). citeturn0search6
-- **Wikimedia Commons CC0 deck (single SVG file)**. citeturn0search9
+### 8.2 Slot markers
+Empty slots show translucent markers indicating which face cards can be placed:
+- King slots (corners): ♚ with gold-tinted background
+- Queen slots (top/bottom middles): ♛ with orange-tinted background
+- Jack slots (side middles): **J** (italic) with green-tinted background
+- Center slots: no marker, neutral background
 
-> Verify license text before shipping; vendor the files into `/assets/`.
+### 8.3 Jungle theme
+- Dark green gradient backgrounds (`#1a2f1a` to `#2d4a2d`).
+- Gold accent color (`#d4a843`) for borders, highlights, and title gradient.
+- Decorative jungle emoji elements (🌿 🌴) as subtle fixed overlays.
+- Board has a semi-transparent green panel with gold border.
 
-### 8.3 Jungle theme assets
-- Background texture (leaves), wood/stone UI panels, jungle accent colors.
-- Sound effects (optional, toggleable): card place, remove combo, win, lose “monkey screech”.
+### 8.4 Sound effects
+- **Game-over sound**: `/assets/sfx/fart1.ogg` — plays when the lose modal appears (toggleable via settings).
+
+### 8.5 Risk meter
+Status bar displays **face slot occupancy badges** for each type (K, Q, J):
+- Shows `filled/total` count (e.g., `K: 2/4`).
+- **Warning** (orange) when only 1 slot remains.
+- **Complete** (green) when all slots are filled.
 
 ---
 
 ## 9) Options Screen (Settings)
 
-### 9.1 MVP options
+### 9.1 Implemented options
 - Game ID:
   - Random new game
-  - Start by ID
-- Card style:
-  - Asset deck
-  - Minimal CSS
+  - Start by ID (input in header)
+  - Restart same game
 - Animations: on/off
-- Sounds: on/off
+- Sounds: on/off (controls game-over fart sound)
 - Hints: on/off (Hint button disabled if off)
 - Accessibility:
-  - High-contrast mode
-  - Large cards mode
+  - High-contrast mode (black background, brighter colors)
+  - Large cards mode (90×130px instead of 70×100px)
 
 ### 9.2 Future options
+- Card style:
+  - CSS-rendered (current default)
+  - Asset deck (SVG/PNG in `/assets/cards/`)
 - Undo mode:
   - Current turn (default)
   - Off
@@ -258,8 +285,7 @@ GameState = {
   startTimeMs: number,
   elapsedMs: number,
   undoStack: Snapshot[],
-  options: Options,
-  stats: Stats
+  selectedSlotIndex: number|null    // for removal phase card selection
 }
 ```
 
@@ -270,6 +296,28 @@ Snapshot = {
   boardCardIds: (string|null)[],    // length 16
   phase: "PLACEMENT"|"REMOVAL",
   moves: number
+}
+```
+
+### 10.5 Options (persisted to localStorage)
+```js
+Options = {
+  cardStyle: "css",
+  animations: boolean,
+  sounds: boolean,
+  hints: boolean,
+  highContrast: boolean,
+  largeCards: boolean
+}
+```
+
+### 10.6 Stats (persisted to localStorage)
+```js
+Stats = {
+  gamesPlayed: number,
+  gamesWon: number,
+  bestMoves: number|null,
+  bestTimeMs: number|null
 }
 ```
 
@@ -288,38 +336,43 @@ For card `c` and empty slot `s`:
 - Single 10 is removable.
 - Pair is removable if both are number cards (A–10) and sum to 10.
 - Face cards are never removable.
+- Removals can be **chained**: after a removal, if more valid combos exist, the player stays in REMOVAL phase regardless of board fill level.
 
 ### 11.3 Win check
 - Win when count of face cards on board (J/Q/K) reaches **12**.
 
 ### 11.4 Loss checks
 - Placement: next card is face and has 0 legal slots → lose.
-- Removal: board full and no removals exist → lose.
+- Removal: no removals exist and no stock remains → lose.
 
 ---
 
-## 12) Suggested “Fun Features”
+## 12) Suggested "Fun Features"
 
 - **Daily Jungle Challenge**: game id = YYYYMMDD, track best moves/time locally.
-- **Risk meter**: warn when face slots are close to blocked (e.g., “Queens: 3/4 filled”).
+- **Risk meter**: warn when face slots are close to blocked (e.g., "Queens: 3/4 filled"). ✅ Implemented.
 - **Achievements / unlocks**: new card backs / jungle boards.
 - **Combo streak**: during removal phase, count consecutive removals and show jungle animation.
-- **Smart hint level**: “basic hint” vs “least risky slot” heuristic for number placement.
+- **Smart hint level**: "basic hint" vs "least risky slot" heuristic for number placement.
 
 ---
 
 ## 13) Acceptance Criteria (MVP)
 
-1. Correct 4×4 layout with K/Q/J slot mapping.
-2. Next-card preview visible; click empty slot places it; card locks.
-3. Removal only when board full; pairs sum to 10 or single 10.
-4. Win triggers when all 12 face cards are placed.
-5. Loss triggers for blocked face card or full board with no removals.
-6. Game finished modal shows monkey red-ass image; **New Game only**.
-7. Seeded shuffles with Game ID; restart repeats exactly.
-8. Undo works for current “turn” as defined.
-9. Hint button works in both phases.
-10. Runs with **no npm**.
+1. ✅ Correct 4×4 layout with K/Q/J slot mapping.
+2. ✅ Next-card preview visible; click empty slot places it; card locks.
+3. ✅ Removal only when board full; pairs sum to 10 or single 10; chaining supported.
+4. ✅ Win triggers when all 12 face cards are placed.
+5. ✅ Loss triggers for blocked face card or no moves remaining.
+6. ✅ Game finished modal shows monkey red-ass photo, blocking card, and fart sound; **New Game only**.
+7. ✅ Seeded shuffles with Game ID (Mulberry32 + Fisher–Yates); restart repeats exactly.
+8. ✅ Undo works for current "turn" as defined.
+9. ✅ Hint button works in both phases.
+10. ✅ Runs with **no npm**; deployed to GitHub Pages.
+11. ✅ Royalty cards highlight valid/invalid slots on hover.
+12. ✅ Keyboard shortcuts (Ctrl+Z undo, H hint).
+13. ✅ Settings persisted to localStorage (animations, sounds, hints, accessibility).
+14. ✅ Risk meter shows face slot occupancy with warning colors.
 
 ---
 
@@ -328,19 +381,24 @@ For card `c` and empty slot `s`:
 ```
 /kadosh3/
   index.html
+  .gitignore
+  .github/
+    workflows/
+      deploy.yml              # GitHub Pages deployment
   /css/
     styles.css
   /js/
-    app.js
-    state.js
-    rules.js
-    rng.js
-    ui.js
-    storage.js
+    app.js                    # Main orchestration + controls
+    state.js                  # Game state management + undo
+    rules.js                  # Rules engine (pure functions)
+    rng.js                    # Mulberry32 PRNG + Fisher–Yates shuffle
+    ui.js                     # DOM rendering & interactions
+    storage.js                # localStorage for options & stats
   /assets/
-    /cards/
-    monkey-red-ass.png
-    jungle-bg.png
+    /cards/                   # (reserved for future card art assets)
+    monkey-butt.svg           # SVG fallback monkey illustration
+    monkey-red-ass.png        # Real monkey photo for game-over modal
     /sfx/
-  README.md
+      fart1.ogg               # Game-over sound effect
+  kadosh3-spec.md             # This spec
 ```
