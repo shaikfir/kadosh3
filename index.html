@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kadosh 3 — Kings In The Corners</title>
+  <meta name="description" content="Kadosh 3: A jungle-themed solitaire puzzle game inspired by Kings In The Corners">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🃏</text></svg>">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <h1 class="game-title">Kadosh 3</h1>
+    <div class="header-controls">
+      <div class="game-id-panel">
+        <input type="number" id="game-id-input" placeholder="Game #" min="1">
+        <button class="btn" id="btn-start-by-id">Go</button>
+      </div>
+      <button class="btn" id="btn-new-game">New Game</button>
+      <button class="btn" id="btn-restart">Restart</button>
+      <button class="btn" id="btn-undo" disabled>Undo</button>
+      <button class="btn" id="btn-hint">Hint</button>
+      <button class="btn" id="btn-settings">⚙</button>
+    </div>
+  </header>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span id="game-id-display">Game #—</span>
+    <span id="phase-display" class="phase-badge">—</span>
+    <span id="moves-display">Moves: 0</span>
+    <span id="timer-display">00:00</span>
+    <span id="face-status"></span>
+  </div>
+
+  <!-- Game Area -->
+  <main class="game-area">
+    <div class="stock-panel">
+      <span class="stock-label">Next Card</span>
+      <div id="next-card-preview"></div>
+      <span id="stock-count">52 cards left</span>
+    </div>
+    <div id="board"></div>
+  </main>
+
+  <!-- Game Over / Win Modal -->
+  <div class="modal-overlay" id="game-modal">
+    <div class="modal-box" id="modal-content"></div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-box">
+      <h2 class="modal-title">Settings</h2>
+      <div class="settings-grid">
+        <div class="setting-row">
+          <label for="opt-animations">Animations</label>
+          <label class="toggle">
+            <input type="checkbox" id="opt-animations" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <label for="opt-sounds">Sounds</label>
+          <label class="toggle">
+            <input type="checkbox" id="opt-sounds">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <label for="opt-hints">Hints enabled</label>
+          <label class="toggle">
+            <input type="checkbox" id="opt-hints" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <label for="opt-high-contrast">High contrast</label>
+          <label class="toggle">
+            <input type="checkbox" id="opt-high-contrast">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <label for="opt-large-cards">Large cards</label>
+          <label class="toggle">
+            <input type="checkbox" id="opt-large-cards">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button class="btn btn-primary" id="btn-save-settings">Save</button>
+        <button class="btn" id="btn-cancel-settings">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <!-- Scripts (order matters: dependencies first) -->
+  <script src="js/rng.js"></script>
+  <script src="js/rules.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
